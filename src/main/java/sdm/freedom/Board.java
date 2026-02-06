@@ -12,7 +12,9 @@ public class Board {
                 board[i][j]=0;
             }
         }
-
+    }
+    public Board(int[][] NewBoard){
+        board = NewBoard;
     }
 
     public int[][] giveBoard(){
@@ -33,10 +35,10 @@ public class Board {
     }
 
     public void printBoard(){
-        for (int[] ints : board) {
+        for (int i=0;i<board.length;i++) {
             StringBuilder row = new StringBuilder();
             for (int j = 0; j < board.length; j++) {
-                row.append(ints[j]).append(" ");
+                row.append(board[j][i]).append(" ");
             }
             System.out.println(row);
         }
@@ -63,6 +65,65 @@ public class Board {
 
     public boolean checkLivePosition(int x,int y){
 
-        return false;
+        int[][][] directions = {
+                {
+                {-4,0},{-3,0},{-2,0},{-1,0},
+                {1,0},{2,0},{3,0},{4,0}
+                },
+                {
+                {0,-4},{0,-3},{0,-2},{0,-1},
+                {0,1},{0,2},{0,3},{0,4}
+                },
+                {
+                {-4,-4},{-3,-3},{-2,-2},{-1,-1},
+                {1,1},{2,2},{3,3},{4,4}
+                },
+                {
+                {-4,4},{-3,3},{-2,2},{-1,1},
+                {1,-1},{2,-2},{3,-3},{4,-4}
+                }
+        };
+        int player = board[x][y];
+        boolean flagLive = false;
+        for(int[][] dir : directions){
+            int counterDead = 0;
+            int conterLive = 0;
+            for(int[] coordinates : dir){
+                int newx = x + coordinates[0];
+                int newy = y + coordinates[1];
+                if(isOutOfBounds(new Move(newx,newy))){
+                    continue;
+                }
+                if(board[newx][newy]==player){
+                    counterDead +=1;
+                }else{
+                    counterDead = 0;
+                }
+                if(board[newx][newy]==player && Math.abs(coordinates[0])<4 && Math.abs(coordinates[1])<4){
+                    conterLive +=1;
+                }else{
+                    conterLive =0;
+                }
+                if(conterLive==3){
+                    flagLive = true;
+                }
+
+                if(counterDead>=4){
+                    flagLive = false;
+                }
+            }
+            if(flagLive){
+                return flagLive;
+            }
+        }
+
+        return flagLive;
+    }
+
+    public boolean isOutOfBounds(Move m){
+        int x = m.returnMove()[0];
+        int y = m.returnMove()[1];
+
+        return x<0 || y<0 || y>=board.length || x>=board.length;
     }
 }

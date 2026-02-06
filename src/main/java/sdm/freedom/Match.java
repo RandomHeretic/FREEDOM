@@ -26,19 +26,24 @@ public class Match {
     }
 
     public boolean checkValidMove(Move NewMove){
-        if (CurrentState.giveBoardPosition(NewMove) !=0 ){
+        if (CurrentState.giveBoard().isOutOfBounds(NewMove) || CurrentState.giveBoardPosition(NewMove) !=0){
             return false;
         }
         if (CurrentState.giveLastMove() == null){
             return true;
         }
-        int[][] neighbours = {{1,0},{-1,0},{0,1},{0,-1}};
+        int[][] neighbours = {{1,0},{-1,0},{0,1},{0,-1},{1,1},{1,-1},{-1,1},{-1,-1}};
         boolean flagFreedom=false; //checks for empty spaces next to the last move
         boolean flagNext=false;
-        for(int[] nei: neighbours){
-            // refactoring TODO
-            Move LastMoveNeighbour = new Move(CurrentState.giveLastMove().returnMove()[0]+nei[0],CurrentState.giveLastMove().returnMove()[1]+nei[1]);
 
+        for(int[] nei: neighbours){
+
+            int newx = CurrentState.giveLastMove().returnMove()[0]+nei[0];
+            int newy = CurrentState.giveLastMove().returnMove()[1]+nei[1];
+            Move LastMoveNeighbour = new Move(newx,newy);
+            if(CurrentState.giveBoard().isOutOfBounds(new Move(newx,newy))){
+                continue;
+            }
             if(CurrentState.giveBoardPosition(LastMoveNeighbour)==0) {
                 flagFreedom = true;
             }

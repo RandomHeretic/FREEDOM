@@ -4,7 +4,6 @@ import sdm.freedom.Board;
 import sdm.freedom.Move;
 
 import java.util.Random;
-import java.util.Scanner;
 
 public class RandomAgent extends AbstractAgent {
 

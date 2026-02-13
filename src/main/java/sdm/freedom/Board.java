@@ -1,6 +1,6 @@
 package sdm.freedom;
 
-
+import java.util.Arrays;
 
 public class Board {
     private final int[][] board;
@@ -129,6 +129,13 @@ public class Board {
 
         return x<0 || y<0 || y>=board.length || x>=board.length;
     }
+
+    public boolean isFull() {
+        return Arrays.stream(board)
+                .flatMapToInt(Arrays::stream)
+                .allMatch(x -> x != 0);
+    }
+
     @Override
     public Board clone(){
         return new Board(Arrays.stream(board)

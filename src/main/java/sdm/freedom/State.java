@@ -74,6 +74,11 @@ public class State {
 
         return successorList.toArray(new Move[0]);
     }
+
+    public boolean isTerminal(){
+        return CurrentBoard.isFull();
+    }
+
     @Override
     public State clone(){
         return new State(CurrentBoard.clone(), LastMove);

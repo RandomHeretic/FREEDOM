@@ -185,4 +185,21 @@ public class FreedomBasicTests {
         assert state1.giveBoardPosition(0, 0) == state2.giveBoardPosition(0, 0);
     }
 
+    @Test
+    public void verifyBoardTermination(){
+        Board board = new Board(1);
+        assert !board.isFull();
+        board.applyMove(new Move(0,0),1);
+        assert board.isFull();
+    }
+
+    @Test
+    public void verifyStateTermination(){
+        Board board = new Board(1);
+        State state = new State(board);
+        assert !state.isTerminal();
+        state.applyMove(new Move(0,0),1);
+        assert state.isTerminal();
+    }
+
 }

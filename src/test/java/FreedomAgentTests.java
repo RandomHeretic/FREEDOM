@@ -5,7 +5,9 @@ import sdm.freedom.State;
 import sdm.freedom.agents.AbstractAgent;
 import sdm.freedom.agents.AgentFactory;
 import sdm.freedom.agents.HumanAgent;
+import java.io.ByteArrayInputStream;
 import java.util.Arrays;
+import java.util.List;
 
 public class FreedomAgentTests {
 
@@ -27,14 +29,21 @@ public class FreedomAgentTests {
     }
 
     @Test
-    public void verifyValidMoveFromAgents(){
-        for(String agentName : AgentFactory.availableAgents()){
-            AbstractAgent agent = AgentFactory.create("Player");
-            Board board = new Board(3);
-            State state = new State(board);
-            state.applyMove(new Move(1, 1), 0);
-            assert Arrays.asList(state.getLegalSuccessors()).contains( agent.selectNextMove(state.giveBoard(), state.getLegalSuccessors()));
+    public void verifyValidMoveFromPlayerAgent(){
+        AbstractAgent agent = AgentFactory.create("Player");
+        Board board = new Board(3);
+        State state = new State(board);
+        state.applyMove(new Move(1, 1), 0);
+        List<Move> successors = Arrays.asList(state.getLegalSuccessors());
+
+        for(int i = 0; i < successors.size(); i++){
+            System.setIn(new ByteArrayInputStream(String.valueOf(i).getBytes()));
+            Move nextMove = agent.selectNextMove(state.giveBoard(), successors.toArray(new Move[0]));
+
+            assert successors.contains(nextMove);
         }
+        //reset
+        System.setIn(System.in);
     }
 
 }

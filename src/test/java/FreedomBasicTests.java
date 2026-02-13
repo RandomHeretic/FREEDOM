@@ -90,4 +90,12 @@ public class FreedomBasicTests {
         assert Mat.giveCurrentState().giveBoardPosition(m2)==2;
     }
 
+    @Test
+    public void verifyBoardSize(){
+        int TEST_SIZE = 8;
+        Board b = new Board(TEST_SIZE);
+        assert b.getBoardSize() == TEST_SIZE;
+    }
+
+
 }

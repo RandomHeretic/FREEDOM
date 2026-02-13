@@ -14,6 +14,14 @@ public class Match {
         return CurrentState;
     }
 
+    public int getCurrentPlayer(){
+        return CurrentPlayer;
+    }
+
+    public int getCurrentPlayerIdx(){
+        return getCurrentPlayer()-1;
+    }
+
     public void applyAMove(Move NewMove){
         if(checkValidMove(NewMove)) {
             CurrentState.applyMove(NewMove, CurrentPlayer);

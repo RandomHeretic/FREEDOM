@@ -16,7 +16,7 @@ public class FreedomAgentTests {
         }
     }
 
-    @Test(expected = Exception.class)
+    @Test(expected = IllegalArgumentException.class)
     public void throwsExceptionForUnknownAgentType() {
         AgentFactory.create("unknownAgentThatDoesNotExist");
     }

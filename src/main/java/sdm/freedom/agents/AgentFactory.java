@@ -17,7 +17,9 @@ public class AgentFactory {
     }
 
     public static AbstractAgent create(String type){
-        throw new java.lang.UnsupportedOperationException("Not yet implemented");
+        Supplier<AbstractAgent> supplier = AGENT_REGISTRY.get(type);
+        if (supplier == null) throw new IllegalArgumentException("Unknown agent type: " + type);
+        return supplier.get();
     }
 
     public static Set<String> availableAgents() {

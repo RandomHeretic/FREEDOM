@@ -1,5 +1,8 @@
 package sdm.freedom;
 
+import sdm.freedom.agents.AbstractAgent;
+import sdm.freedom.agents.AgentFactory;
+
 import java.util.Scanner;
 
 public class Main {
@@ -9,25 +12,41 @@ public class Main {
         System.out.println("Welcome to Freedom, state the size of the board please");
 
         int n = s.nextInt();
+        s.nextLine(); //flush after nextInt
 
         Match CurrentMatch = new Match(n);
+
+        System.out.println("Available agents: " + AgentFactory.availableAgents());
+
+        AbstractAgent[] agents = new AbstractAgent[] {askUserForAgentCreation(1, s), askUserForAgentCreation(2, s)};
 
         for(int i=0;i<n*n;i++){
             System.out.println("Current Board State:");
             CurrentMatch.printBoardState();
-            System.out.println("To exit write a -1 for either x or y");
-            System.out.println("State your next move (first x, then y)");
-            int x = s.nextInt();
-            int y = s.nextInt();
-            if (x<0 || y<0){
-                break;
-            }
-            CurrentMatch.applyAMove(new Move(x,y));
+
+            CurrentMatch.applyAMove(agents[CurrentMatch.getCurrentPlayerIdx()].selectNextMove(
+                    CurrentMatch.giveCurrentState().giveBoard(),
+                    CurrentMatch.giveCurrentState().getLegalSuccessors()
+            ));
         }
         System.out.println("The game ended with the following scores");
         int[] scores = CurrentMatch.evaluateBoard();
         System.out.println("White: " + scores[0]);
         System.out.println("Black: " + scores[1]);
 
+    }
+
+    private static AbstractAgent askUserForAgentCreation(int playerNumber, Scanner s){
+        AbstractAgent agent = null;
+        while (agent == null) {
+            System.out.print("Enter type for Agent "+playerNumber+": ");
+            String type2 = s.nextLine().trim();
+            try {
+                agent = AgentFactory.create(type2);
+            } catch (IllegalArgumentException e) {
+                System.out.println("Invalid agent type. Please choose from: " + AgentFactory.availableAgents());
+            }
+        }
+        return agent;
     }
 }

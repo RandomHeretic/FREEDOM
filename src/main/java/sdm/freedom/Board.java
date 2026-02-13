@@ -20,6 +20,9 @@ public class Board {
     public int[][] giveBoard(){
         return board;
     }
+    public int getBoardSize(){
+        return board.length;
+    }
 
     public int givePosition(int x,int y){
         return board[x][y];

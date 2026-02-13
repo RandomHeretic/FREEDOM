@@ -14,14 +14,18 @@ public class Match {
         return CurrentState;
     }
 
+    public int getCurrentPlayer(){
+        return CurrentPlayer;
+    }
+
+    public int getCurrentPlayerIdx(){
+        return getCurrentPlayer()-1;
+    }
+
     public void applyAMove(Move NewMove){
         if(checkValidMove(NewMove)) {
             CurrentState.applyMove(NewMove, CurrentPlayer);
-            if (CurrentPlayer == 1) {
-                CurrentPlayer = 2;
-            } else {
-                CurrentPlayer = 1;
-            }
+            CurrentPlayer = 3-CurrentPlayer; //swap between 1 and 2
         }
     }
 
@@ -47,7 +51,7 @@ public class Match {
             if(CurrentState.giveBoardPosition(LastMoveNeighbour)==0) {
                 flagFreedom = true;
             }
-            if(NewMove.compareMoves(LastMoveNeighbour)){
+            if(NewMove.equals(LastMoveNeighbour)){
                 flagNext = true;
             }
         }

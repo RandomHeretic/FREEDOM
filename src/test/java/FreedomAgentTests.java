@@ -75,7 +75,7 @@ public class FreedomAgentTests {
     }
 
     @Test
-    public void verifiyAITakesWinningMove() {
+    public void verifyAITakesWinningMove() {
         AbstractAgent agent = AgentFactory.create("AI", 1);
         Board board = new Board(new int[][] {
                 new int[] {1, 1, 1, 2},
@@ -91,7 +91,7 @@ public class FreedomAgentTests {
     }
 
     @Test
-    public void verifiyAIAvoidsLoosingMove() {
+    public void verifyAIAvoidsLoosingMove() {
         AbstractAgent agent = AgentFactory.create("AI", 2);
         Board board = new Board(new int[][] {
                 new int[] {1, 1, 1, 2},

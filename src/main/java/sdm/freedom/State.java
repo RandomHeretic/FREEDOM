@@ -15,7 +15,7 @@ public class State {
     }
 
     public void applyMove(Move NewMove,int player){
-        if(!(NewMove.equals(new Move(-1,-1)))){
+        if(!(NewMove.skipMove())){
             CurrentBoard.applyMove(NewMove,player);
             LastMove=NewMove;
         }
@@ -81,7 +81,7 @@ public class State {
             Board testBoard = CurrentBoard.clone();
             testBoard.applyMove(successorList.toArray(new Move[0])[0],player+1);
             if (score>testBoard.evaluateBoard()[player]){
-                successorList.add(new Move(-1,-1));
+                successorList.add(new Move(true));
             }
         }
         return successorList.toArray(new Move[0]);

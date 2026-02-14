@@ -215,7 +215,7 @@ public class FreedomBasicTests {
         State state = new State(board,new Move(2,2));
         Move[] moves = state.getLegalSuccessors();
 
-        assert moves[1].equals(new Move(-1,-1));
+        assert moves[1].skipMove();
     }
 
     @Test
@@ -231,6 +231,6 @@ public class FreedomBasicTests {
         State state = new State(board,new Move(0,2));
         Move[] moves = state.getLegalSuccessors();
 
-        assert moves[1].equals(new Move(-1,-1));
+        assert moves[1].skipMove();
     }
 }

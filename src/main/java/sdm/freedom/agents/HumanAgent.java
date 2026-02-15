@@ -16,7 +16,11 @@ public class HumanAgent extends AbstractAgent {
 
         Move[] successors = s.getLegalSuccessors();
         for(int i = 0; i < successors.length; i++){
-            System.out.println("Option " + i + ": " + successors[i].toString());
+            if(successors[i].skipMove()){
+                System.out.println("Option " + i + ": Skip");
+            }else {
+                System.out.println("Option " + i + ": " + successors[i].toString());
+            }
         }
 
         Scanner scanner = new Scanner(System.in);

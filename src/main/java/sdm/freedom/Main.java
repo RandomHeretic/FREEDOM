@@ -1,9 +1,9 @@
 package sdm.freedom;
 
+import java.util.Scanner;
+
 import sdm.freedom.agents.AbstractAgent;
 import sdm.freedom.agents.AgentFactory;
-
-import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args){

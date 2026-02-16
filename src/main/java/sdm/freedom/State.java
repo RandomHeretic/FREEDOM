@@ -22,7 +22,7 @@ public class State {
     }
 
 
-    public Board giveBoard(){
+    public Board getBoard(){
         return CurrentBoard;
     }
 
@@ -88,7 +88,7 @@ public class State {
     }
 
     public boolean isTerminal(){
-        return CurrentBoard.isFull();
+        return CurrentBoard.isFull() || ( LastMove!=null && LastMove.skipMove());
     }
 
     @Override

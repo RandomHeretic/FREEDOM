@@ -17,7 +17,7 @@ public class Board {
         board = NewBoard;
     }
 
-    public int[][] giveBoard(){
+    public int[][] getBoardMatrix(){
         return board;
     }
     public int getBoardSize(){

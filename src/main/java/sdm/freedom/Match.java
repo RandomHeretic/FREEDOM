@@ -30,7 +30,7 @@ public class Match {
     }
 
     public boolean checkValidMove(Move NewMove){
-        if (CurrentState.giveBoard().isOutOfBounds(NewMove) || CurrentState.giveBoardPosition(NewMove) !=0){
+        if (CurrentState.getBoard().isOutOfBounds(NewMove) || CurrentState.giveBoardPosition(NewMove) !=0){
             return false;
         }
         if (CurrentState.giveLastMove() == null){
@@ -45,7 +45,7 @@ public class Match {
             int newx = CurrentState.giveLastMove().returnMove()[0]+nei[0];
             int newy = CurrentState.giveLastMove().returnMove()[1]+nei[1];
             Move LastMoveNeighbour = new Move(newx,newy);
-            if(CurrentState.giveBoard().isOutOfBounds(new Move(newx,newy))){
+            if(CurrentState.getBoard().isOutOfBounds(new Move(newx,newy))){
                 continue;
             }
             if(CurrentState.giveBoardPosition(LastMoveNeighbour)==0) {
@@ -67,6 +67,6 @@ public class Match {
     }
 
     public int[] evaluateBoard(){
-        return CurrentState.giveBoard().evaluateBoard();
+        return CurrentState.getBoard().evaluateBoard();
     }
 }

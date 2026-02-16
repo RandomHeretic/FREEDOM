@@ -10,7 +10,7 @@ public class Match {
         CurrentPlayer = 1;
     }
 
-    public State giveCurrentState(){
+    public State getCurrentState(){
         return CurrentState;
     }
 
@@ -23,17 +23,22 @@ public class Match {
     }
 
     public void applyAMove(Move NewMove){
+        // gestione skip move -> se il giocatore sceglie di saltare l'ultima mossa, cambia solo il turno
+        if (NewMove.skipMove()) {
+            CurrentPlayer = 3 - CurrentPlayer;
+            return;
+        }
         if(checkValidMove(NewMove)) {
             CurrentState.applyMove(NewMove, CurrentPlayer);
             CurrentPlayer = 3-CurrentPlayer; //swap between 1 and 2
-        }//else if (CurrentState.isLastMove() && NewMove.equals(new Move(-1,-1){}
+        }
     }
 
     public boolean checkValidMove(Move NewMove){
         if (CurrentState.getBoard().isOutOfBounds(NewMove) || CurrentState.giveBoardPosition(NewMove) !=0){
             return false;
         }
-        if (CurrentState.giveLastMove() == null){
+        if (CurrentState.getLastMove() == null){
             return true;
         }
         int[][] neighbours = {{1,0},{-1,0},{0,1},{0,-1},{1,1},{1,-1},{-1,1},{-1,-1}};
@@ -42,8 +47,8 @@ public class Match {
 
         for(int[] nei: neighbours){
 
-            int newx = CurrentState.giveLastMove().returnMove()[0]+nei[0];
-            int newy = CurrentState.giveLastMove().returnMove()[1]+nei[1];
+            int newx = CurrentState.getLastMove().returnMove()[0]+nei[0];
+            int newy = CurrentState.getLastMove().returnMove()[1]+nei[1];
             Move LastMoveNeighbour = new Move(newx,newy);
             if(CurrentState.getBoard().isOutOfBounds(new Move(newx,newy))){
                 continue;

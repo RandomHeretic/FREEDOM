@@ -75,13 +75,13 @@ public class FreedomBasicTests {
         Move m = new Move(1,3);
         State s = new State(b,m);
         assert b == s.getBoard();
-        assert m == s.giveLastMove();
+        assert m == s.getLastMove();
     }
 
     @Test
     public void verifyMatchHasState(){
         Match M = new Match(8);
-        assert M.giveCurrentState().getClass()== State.class;
+        assert M.getCurrentState().getClass()== State.class;
     }
 
     @Test
@@ -91,8 +91,8 @@ public class FreedomBasicTests {
         Match Mat = new Match(5);
         Mat.applyAMove(m1);
         Mat.applyAMove(m2);
-        assert Mat.giveCurrentState().giveBoardPosition(m1)==1;
-        assert Mat.giveCurrentState().giveBoardPosition(m2)==2;
+        assert Mat.getCurrentState().giveBoardPosition(m1)==1;
+        assert Mat.getCurrentState().giveBoardPosition(m2)==2;
     }
 
     @Test

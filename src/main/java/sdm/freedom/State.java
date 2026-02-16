@@ -33,7 +33,7 @@ public class State {
         return CurrentBoard.givePosition(new Move(x,y));
     }
 
-    public Move giveLastMove(){
+    public Move getLastMove(){
         return LastMove;
     }
 

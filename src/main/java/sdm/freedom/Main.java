@@ -1,19 +1,17 @@
 package sdm.freedom;
 
-
 import java.util.Scanner;
 
-
 public class Main {
-   public static void main(String[] args){
-       // Test Grafico Rapido
-       System.out.println("Inserisci dimensione board per test grafico:");
-       Scanner s = new Scanner(System.in);
-       int n = s.nextInt();
-      
-       // Usiamo il Singleton per lanciare la GUI
-       UI.getInstance().startGUI(n);
-   }
+
+    public static void main(String[] args) {
+        System.out.println("Inserisci dimensione board per test grafico:");
+        Scanner s = new Scanner(System.in);
+        int n = s.nextInt();
+
+        // singleton x lanciare la GUI
+        UI.getInstance().startGUI(n);
+    }
 }
 
 
@@ -69,4 +67,4 @@ public class Main {
         return agent;
     }
 }
-*/
+ */

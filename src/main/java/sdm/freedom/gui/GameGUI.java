@@ -3,13 +3,13 @@ package sdm.freedom.gui;
 import java.awt.BorderLayout;
 
 import javax.swing.JFrame;
-import javax.swing.WindowConstants; // x dividere la finestra
+import javax.swing.WindowConstants;
 
 public class GameGUI extends JFrame {
-    
+
     // riferimenti ai due pannelli
     private final BoardPanel boardPanel;
-    private final InfoPanel infoPanel; 
+    private final InfoPanel infoPanel;
 
     public GameGUI(int n) {
         super("Freedom Game");
@@ -20,13 +20,12 @@ public class GameGUI extends JFrame {
 
         // creo due pannelli
         boardPanel = new BoardPanel(n);
-        infoPanel = new InfoPanel(); 
+        infoPanel = new InfoPanel();
 
-        add(boardPanel, BorderLayout.CENTER); // scacchiera - centro
-        // aggiungo i pannelli alle zone specifiche secondo il layout manager
-        add(infoPanel, BorderLayout.EAST);    // info - destra
+        add(boardPanel, BorderLayout.CENTER);
+        add(infoPanel, BorderLayout.EAST);
 
-        pack(); 
+        pack();
         setLocationRelativeTo(null);
     }
 
@@ -35,5 +34,10 @@ public class GameGUI extends JFrame {
         boardPanel.repaint();
         // aggiorna i testi laterali
         infoPanel.updateInfo(currentPlayer, whiteScore, blackScore);
+    }
+
+    public void showGameOver(String risultato, int whiteScore, int blackScore) {
+        boardPanel.repaint();
+        infoPanel.showGameOver(risultato, whiteScore, blackScore);
     }
 }

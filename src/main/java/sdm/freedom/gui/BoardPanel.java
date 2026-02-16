@@ -2,137 +2,209 @@ package sdm.freedom.gui;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.swing.JPanel;
 
+import sdm.freedom.Move;
 import sdm.freedom.UI;
 
-
-// JPanel è una superficie vuota su cui disegnare
 public class BoardPanel extends JPanel {
-  
-   private final int boardSize; // dimensione della griglia
-   private final int CELL_SIZE = 80; // quanto è grande ogni quadrato in pixel
-   private final int MARGIN = 100; // spazio ai bordi
 
-   private final int PIECE_PADDING = 4; // dimensione pedina
+    private final int boardSize;
+    private final int CELL_SIZE = 80;
+    private final int MARGIN = 60;
+    private final int PIECE_PADDING = 6;
 
+    // colori cella alternati (scacchiera)
+    private static final Color CELL_LIGHT = new Color(240, 217, 181);  // beige chiaro
+    private static final Color CELL_DARK = new Color(181, 136, 99);   // marrone
 
-   public BoardPanel(int n) {
-       this.boardSize = n;
-      
-       // calcoliamo quanto deve essere grande il pannello in pixel
-       int pixelWidth = (n * CELL_SIZE) + (MARGIN * 2);
-       int pixelHeight = (n * CELL_SIZE) + (MARGIN * 2);
-      
-       // impostiamo la dimensione preferita (x pack())
-       setPreferredSize(new Dimension(pixelWidth, pixelHeight));
-      
-       // impostiamo un colore di sfondo (marroncino tipo legno -> 220, 180, 130)
-       setBackground(new Color(220, 180, 130));
-  
-       // mouse listener -> per prendere gli input
-       addMouseListener(new MouseAdapter() {
-           @Override
-           public void mouseClicked(MouseEvent e) {
-               // coordinate del click in pixel
-               int x = e.getX();
-               int y = e.getY();
+    // colore sfondo esterno 
+    private static final Color BG_COLOR = new Color(49, 46, 43);       // grigio scuro
 
+    // colore etichette
+    private static final Color LABEL_COLOR = new Color(200, 200, 200); // grigio chiaro
 
-               // togliamo il margine per lavorare solo sulla griglia
-               int gridX = x - MARGIN;
-               int gridY = y - MARGIN;
+    // colore mosse legali
+    private static final Color LEGAL_MOVE_COLOR = new Color(100, 200, 100, 110); // verde trasparente
 
+    // colore bordo griglia
+    private static final Color GRID_BORDER_COLOR = new Color(30, 30, 30);
 
-               // controlliamo se siamo fuori dalla griglia
-               if (gridX < 0 || gridY < 0) return;
+    public BoardPanel(int n) {
+        this.boardSize = n;
 
+        // calcoliamo quanto deve essere grande il pannello in pixel
+        int pixelWidth = (n * CELL_SIZE) + (MARGIN * 2);
+        int pixelHeight = (n * CELL_SIZE) + (MARGIN * 2);
 
-               // convertiamo i pixel in indici di matrice
-               int col = gridX / CELL_SIZE;
-               int row = gridY / CELL_SIZE;
+        // impostiamo la dimensione preferita (x pack())
+        setPreferredSize(new Dimension(pixelWidth, pixelHeight));
+        setBackground(BG_COLOR);
 
+        // FIX CLICK (non funziona benissimo -> serve x migliorare lo sniff del mouseListener)
+        setFocusable(true);
+        requestFocusInWindow();
 
-               // controlliamo se siamo usciti dalla griglia
-               if (col >= boardSize || row >= boardSize) return;
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                requestFocusInWindow();
 
+                int gridX = e.getX() - MARGIN;
+                int gridY = e.getY() - MARGIN;
+                if (gridX < 0 || gridY < 0) {
+                    return;
+                }
 
-               // AZIIONE
-               System.out.println("Hai cliccato la cella: Riga " + (row+1) + ", Colonna " + (col+1));
+                // convertiamo i pixel in indici di matrice
+                int col = gridX / CELL_SIZE;
+                int row = gridY / CELL_SIZE;
 
-               // proviamo a muovere
-               UI.getInstance().tryMove(row, col);
-              
-               // repaint(); // Ridisegna la scacchiera con la nuova pedina
-           }
-       });
-   }
+                // controlliamo se siamo usciti dalla griglia
+                if (col >= boardSize || row >= boardSize) {
+                    return;
+                }
 
+                // AZIIONE
+                System.out.println("Hai cliccato la cella: Riga " + (row + 1) + ", Colonna " + (col + 1));
 
-   @Override
-   protected void paintComponent(Graphics g) {
-       super.paintComponent(g); // pulisce il disegno precedente
+                // proviamo a muovere
+                UI.getInstance().tryMove(row, col);
+            }
+        });
+    }
 
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
 
-       // impostiamo il colore per le linee
-       g.setColor(Color.BLACK);
+        // x fare grafica in 2D (con ombre)
+        Graphics2D g2 = (Graphics2D) g;
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
-
-       // GRIGLIA (includo la n+1 esima riga/colonna)
-       for (int i = 0; i <= boardSize; i++) {
-           // disegna linee orizzontali
-           g.drawLine(
-               MARGIN,                     // x inizio
-               MARGIN + (i * CELL_SIZE),   // y inizio
-               MARGIN + ((boardSize) * CELL_SIZE), // x fine
-               MARGIN + (i * CELL_SIZE)    // y fine
-           );
-
-
-           // disegna linee verticali
-           g.drawLine(
-               MARGIN + (i * CELL_SIZE),   // x inizio
-               MARGIN,                     // y inizio
-               MARGIN + (i * CELL_SIZE),   // x fine
-               MARGIN + ((boardSize) * CELL_SIZE) // y fine
-           );
-       }
-
-       // PEDINE 
-       // scansione x dove sono i pezzi
+        // celle colore diverso
         for (int r = 0; r < boardSize; r++) {
             for (int c = 0; c < boardSize; c++) {
-                
-                // x cosa c'è in questa cella
+                if ((r + c) % 2 == 0) {
+                    g2.setColor(CELL_LIGHT);
+                } else {
+                    g2.setColor(CELL_DARK);
+                }
+                g2.fillRect(
+                        MARGIN + (c * CELL_SIZE),
+                        MARGIN + (r * CELL_SIZE),
+                        CELL_SIZE, CELL_SIZE
+                );
+            }
+        }
+
+        // mosse legali
+        if (!UI.getInstance().isGameOver()) {
+            Move[] legalMoves = UI.getInstance().getLegalMoves();
+            Set<String> legalSet = new HashSet<>();
+            for (Move m : legalMoves) {
+                if (m.x() >= 0 && m.y() >= 0) {
+                    legalSet.add(m.x() + "," + m.y());
+                }
+            }
+
+            g2.setColor(LEGAL_MOVE_COLOR);
+            for (int r = 0; r < boardSize; r++) {
+                for (int c = 0; c < boardSize; c++) {
+                    if (legalSet.contains(r + "," + c)) {
+                        g2.fillRect(
+                                MARGIN + (c * CELL_SIZE),
+                                MARGIN + (r * CELL_SIZE),
+                                CELL_SIZE, CELL_SIZE
+                        );
+                    }
+                }
+            }
+        }
+
+        // bordo griglia
+        g2.setColor(GRID_BORDER_COLOR);
+        g2.drawRect(
+                MARGIN, MARGIN,
+                boardSize * CELL_SIZE, boardSize * CELL_SIZE
+        );
+
+        // etichette
+        Font labelFont = new Font("SansSerif", Font.BOLD, 16);
+        g2.setFont(labelFont);
+        g2.setColor(LABEL_COLOR);
+        FontMetrics fm = g2.getFontMetrics();
+
+        for (int i = 0; i < boardSize; i++) {
+            // lettere colonne
+            String colLabel = String.valueOf((char) ('A' + i));
+            int labelW = fm.stringWidth(colLabel);
+
+            // sopra
+            int colX = MARGIN + (i * CELL_SIZE) + (CELL_SIZE / 2) - (labelW / 2);
+            int colYTop = MARGIN - 12;
+            g2.drawString(colLabel, colX, colYTop);
+
+            /*
+            // sotto
+            int colYBottom = MARGIN + (boardSize * CELL_SIZE) + fm.getAscent() + 8;
+            g2.drawString(colLabel, colX, colYBottom);
+             */
+            // numeri righe
+            String rowLabel = String.valueOf(i + 1);
+            int rowLabelW = fm.stringWidth(rowLabel);
+            int rowY = MARGIN + (i * CELL_SIZE) + (CELL_SIZE / 2) + (fm.getAscent() / 2) - 2;
+
+            // sinistra
+            int rowXLeft = MARGIN - rowLabelW - 12;
+            g2.drawString(rowLabel, rowXLeft, rowY);
+
+            /* 
+            // destra
+            int rowXRight = MARGIN + (boardSize * CELL_SIZE) + 12;
+            g2.drawString(rowLabel, rowXRight, rowY);
+             */
+        }
+
+        // pedine
+        for (int r = 0; r < boardSize; r++) {
+            for (int c = 0; c < boardSize; c++) {
+
                 int value = UI.getInstance().getPieceAt(r, c);
-                
+
                 if (value != 0) {
                     // calcoliamo dove disegnare il cerchio in pixel
                     int pixelX = MARGIN + (c * CELL_SIZE) + PIECE_PADDING;
                     int pixelY = MARGIN + (r * CELL_SIZE) + PIECE_PADDING;
                     int diameter = CELL_SIZE - (PIECE_PADDING * 2);
 
-                    // impostiamo il colore
-                    if (value == 1) {
-                        g.setColor(Color.WHITE);
-                    } else if (value == 2) {
-                        g.setColor(Color.BLACK);
-                    }
+                    // ombra sotto la pedina 
+                    g2.setColor(new Color(0, 0, 0, 60));
+                    g2.fillOval(pixelX + 3, pixelY + 3, diameter, diameter);
 
-                    // disegniamo il cerchio pieno
-                    g.fillOval(pixelX, pixelY, diameter, diameter);
-                    
-                    // pedina è bianca => contorno nero
                     if (value == 1) {
-                        g.setColor(Color.BLACK);
-                        g.drawOval(pixelX, pixelY, diameter, diameter);
+                        g2.setColor(new Color(245, 245, 245)); // bianco leggero
+                    } else {
+                        g2.setColor(new Color(30, 30, 30)); // nero intenso
                     }
+                    g2.fillOval(pixelX, pixelY, diameter, diameter);
+
+                    // contorno per entrambe le pedine
+                    g2.setColor(new Color(60, 60, 60));
+                    g2.drawOval(pixelX, pixelY, diameter, diameter);
                 }
             }
         }
-   }
+    }
 }

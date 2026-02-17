@@ -23,6 +23,7 @@ public class InfoPanel extends JPanel {
     private final JLabel blackScoreLabel;
     private final JLabel resultLabel;
     private final JButton skipButton;
+    private final JButton menuButton;
 
     public InfoPanel() {
         // metto gli elementi uno sotto l'altro
@@ -72,10 +73,9 @@ public class InfoPanel extends JPanel {
             }
         };
 
-
         skipButton.setFont(new Font("Arial", Font.BOLD, 16));
-        skipButton.setBackground(new Color(200, 80, 80)); 
-        skipButton.setForeground(Color.WHITE);  
+        skipButton.setBackground(new Color(200, 80, 80));
+        skipButton.setForeground(Color.WHITE);
 
         // disattiva stile nativo Mac
         skipButton.setContentAreaFilled(false);
@@ -89,6 +89,31 @@ public class InfoPanel extends JPanel {
         // push -> Singleton esegue skip
         skipButton.addActionListener(e -> UIController.getInstance().userClickedForMove(new Move(true)));
 
+        // bottone Menu -> torna al menu principale
+        menuButton = new JButton("Menu") {
+            @Override
+            protected void paintComponent(Graphics g) {
+                if (getModel().isPressed()) {
+                    g.setColor(getBackground().darker());
+                } else {
+                    g.setColor(getBackground());
+                }
+                g.fillRect(0, 0, getWidth(), getHeight());
+                super.paintComponent(g);
+            }
+        };
+        menuButton.setFont(new Font("Arial", Font.BOLD, 16));
+        menuButton.setBackground(new Color(80, 80, 200));
+        menuButton.setForeground(Color.WHITE);
+        menuButton.setContentAreaFilled(false);
+        menuButton.setFocusPainted(false);
+        menuButton.setBorderPainted(false);
+        menuButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        menuButton.setPreferredSize(new Dimension(160, 45));
+        menuButton.setMaximumSize(new Dimension(160, 45));
+
+        menuButton.addActionListener(e -> UIController.getInstance().backToMenu());
+
         add(turnLabel);
         add(new JLabel(" "));
         add(new JLabel(" "));
@@ -100,6 +125,8 @@ public class InfoPanel extends JPanel {
         add(resultLabel);
         add(Box.createVerticalGlue()); // bottone in fondo pannello
         add(skipButton);
+        add(Box.createRigidArea(new Dimension(0, 10)));
+        add(menuButton);
         add(Box.createRigidArea(new Dimension(0, 20))); // margine sotto bottone
     }
 
@@ -127,7 +154,7 @@ public class InfoPanel extends JPanel {
         turnLabel.setForeground(new Color(180, 0, 0));
         whiteScoreLabel.setText("Bianchi: " + whiteScore);
         blackScoreLabel.setText("Neri: " + blackScore);
-        skipButton.setVisible(false); 
+        skipButton.setVisible(false);
         resultLabel.setText(risultato);
         resultLabel.setVisible(true);
     }

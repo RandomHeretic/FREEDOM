@@ -165,12 +165,10 @@ public class MenuGUI extends JFrame {
 
         // ritardia l'inizializzazione del GameController per assicurarsi che la UI sia pronta
         SwingUtilities.invokeLater(()
-                -> SwingUtilities.invokeLater(()
-                        -> GameController.getInstance().initialize(boardSize, uiController, agentsArr)
-                )
+                -> GameController.getInstance().initialize(boardSize, uiController, agentsArr)
         );
-    }
 
+    }
 
     private JLabel formLabel(String text) {
         return styledLabel(text, new Font("SansSerif", Font.BOLD, 14), TEXT_LIGHT);

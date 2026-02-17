@@ -30,6 +30,7 @@ public class GameController implements MoveInputListener {
         this.uiController = uiController;
         this.agents = agents;
         this.match = new Match(boardSize);
+        this.gameOver = false;
 
         uiController.setMoveInputListener(this);
 
@@ -49,6 +50,8 @@ public class GameController implements MoveInputListener {
     }
 
     private void startTurn() {
+        if (gameOver) return;
+
         AbstractAgent agent = agents[match.getCurrentPlayerIdx()];
 
         CompletableFuture<Move> future
@@ -58,6 +61,8 @@ public class GameController implements MoveInputListener {
     }
 
     private void applyMove(Move move) {
+        if (gameOver) return;
+
         if (!match.checkValidMove(move)) {
             return;
         }
@@ -112,6 +117,13 @@ public class GameController implements MoveInputListener {
         return gameOver;
     }
 
+    public void reset() {
+        gameOver = true;
+        match = null;
+        agents = null;
+        uiController = null;
+    }
+
     public int[][] getBoard() {
         return match.getCurrentState().getBoard().getBoardMatrix();
     }
@@ -122,6 +134,8 @@ public class GameController implements MoveInputListener {
 
     @Override
     public void onMoveSelected(Move move) {
+        if (gameOver || match == null) return;
+
         if (!match.checkValidMove(move)) {
             return;
         }

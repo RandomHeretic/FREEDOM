@@ -9,9 +9,6 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.HashSet;
-import java.util.Set;
-
 import javax.swing.JPanel;
 
 import sdm.freedom.GameController;
@@ -36,9 +33,6 @@ public class BoardPanel extends JPanel {
 
     // colore etichette
     private static final Color LABEL_COLOR = new Color(200, 200, 200); // grigio chiaro
-
-    // colore mosse legali
-    private static final Color LEGAL_MOVE_COLOR = new Color(100, 200, 100, 110); // verde trasparente
 
     // colore bordo griglia
     private static final Color GRID_BORDER_COLOR = new Color(30, 30, 30);

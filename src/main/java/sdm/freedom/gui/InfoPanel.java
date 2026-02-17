@@ -83,9 +83,7 @@ public class InfoPanel extends JPanel {
         skipButton.setVisible(false); // nascosto finché non serve
 
         // quando premuto, dice al Singleton di eseguire lo skip
-        skipButton.addActionListener(e -> {
-            UIController.getInstance().userClickedForMove(new Move(true));
-        });
+        skipButton.addActionListener(e -> UIController.getInstance().userClickedForMove(new Move(true)));
 
         add(turnLabel);
         add(new JLabel(" "));

@@ -37,17 +37,6 @@ public class Board {
         board[m[0]][m[1]]=player;
     }
 
-    public void printBoard(){
-        for (int i=0;i<board.length;i++) {
-            StringBuilder row = new StringBuilder();
-            for (int j = 0; j < board.length; j++) {
-                row.append(board[j][i]).append(" ");
-            }
-            System.out.println(row);
-        }
-
-    }
-
     public int[] evaluateBoard(){
         int white=0;
         int black =0;

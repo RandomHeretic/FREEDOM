@@ -14,7 +14,7 @@ public class GameController implements MoveInputListener {
     private Match match;
     private UIController uiController;
     private AbstractAgent[] agents;
-    private boolean gameOver = false;
+
 
     private GameController() {
     }
@@ -36,7 +36,7 @@ public class GameController implements MoveInputListener {
     }
 
     public Move[] getLegalMoves() {
-        if (gameOver) return new Move[0];
+
         return  match.getCurrentState().getLegalSuccessors();
     }
 
@@ -54,14 +54,14 @@ public class GameController implements MoveInputListener {
     }
 
     private void applyMove(Move move) {
-        if (!match.checkValidMove(move)) return;
+
 
         match.applyMove(move);
 
         int[] scores = match.evaluateBoard();
         boolean terminal = match.getCurrentState().isTerminal();
 
-        // Run UI update separatley, as to not break game logic by having it wait for unrelated code
+        // Run UI update separately, as to not break game logic by having it wait for unrelated code
         SwingUtilities.invokeLater(() -> {
             uiController.refresh(getPlayerTurn(), scores[0], scores[1]);
             uiController.repaintBoard();
@@ -87,7 +87,7 @@ public class GameController implements MoveInputListener {
     }
 
     public boolean canSkip() {
-        if (match == null || gameOver) {
+        if (match == null) {
             return false;
         }
         for (Move m : getLegalMoves()) {
@@ -98,9 +98,7 @@ public class GameController implements MoveInputListener {
         return false;
     }
 
-    public boolean isGameOver(){
-        return gameOver;
-    }
+
 
     public int[][] getBoard() {
         return match.getCurrentState().getBoard().getBoardMatrix();
@@ -112,7 +110,7 @@ public class GameController implements MoveInputListener {
 
     @Override
     public void onMoveSelected(Move move) {
-        if(!match.checkValidMove(move)) return;
+
         AbstractAgent agent = agents[match.getCurrentPlayerIdx()];
 
         if (agent instanceof InputListenerAgent inputAgent) {

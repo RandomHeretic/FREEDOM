@@ -25,6 +25,8 @@ public class BoardPanel extends JPanel {
     private final int MARGIN = 60;
     private final int PIECE_PADDING = 6;
 
+    private static final Color LAST_MOVE_COLOR = new Color(255, 235, 59);
+
     // colori cella alternati (scacchiera)
     private static final Color CELL_LIGHT = new Color(240, 217, 181);  // beige chiaro
     private static final Color CELL_DARK = new Color(181, 136, 99);   // marrone
@@ -79,7 +81,7 @@ public class BoardPanel extends JPanel {
                 // AZIONE
                 // System.out.println("Hai cliccato la cella: Riga " + (row + 1) + ", Colonna " + (col + 1));
 
-                Move inputMove = new Move(col, row);
+                Move inputMove = new Move(row, col);
                 UIController.getInstance().userClickedForMove(inputMove);
             }
         });
@@ -110,26 +112,44 @@ public class BoardPanel extends JPanel {
             }
         }
 
+        // ultima mossa
+        Move lastMove = GameController.getInstance().getLastMove();
+        if (lastMove != null && !lastMove.skipMove()) {
+            // controlliamo coordinate valide
+            if (lastMove.x() >= 0 && lastMove.y() >= 0) {
+                g2.setColor(LAST_MOVE_COLOR);
+                g2.fillRect(
+                        MARGIN + (lastMove.y() * CELL_SIZE),
+                        MARGIN + (lastMove.x() * CELL_SIZE),
+                        CELL_SIZE, CELL_SIZE
+                );
+            }
+        }
+
         // mosse legali
         if (!GameController.getInstance().isGameOver()) {
             Move[] legalMoves = GameController.getInstance().getLegalMoves();
-            Set<String> legalSet = new HashSet<>();
-            for (Move m : legalMoves) {
-                if (m.x() >= 0 && m.y() >= 0) {
-                    legalSet.add(m.x() + "," + m.y());
-                }
+
+            // dimensione pallino
+            int hintDiameter = CELL_SIZE / 4;
+            // l'offset x centrarlo
+            int offset = (CELL_SIZE - hintDiameter) / 2;
+
+            int currentPlayer = GameController.getInstance().getPlayerTurn();
+
+            if (currentPlayer == 1) {
+                // pallino BIANCO
+                g2.setColor(Color.LIGHT_GRAY);
+            } else {
+                // pallino NERO
+                g2.setColor(Color.BLACK);
             }
 
-            g2.setColor(LEGAL_MOVE_COLOR);
-            for (int r = 0; r < boardSize; r++) {
-                for (int c = 0; c < boardSize; c++) {
-                    if (legalSet.contains(r + "," + c)) {
-                        g2.fillRect(
-                                MARGIN + (c * CELL_SIZE),
-                                MARGIN + (r * CELL_SIZE),
-                                CELL_SIZE, CELL_SIZE
-                        );
-                    }
+            for (Move m : legalMoves) {
+                if (m.x() >= 0 && m.y() >= 0) {
+                    int drawX = MARGIN + (m.y() * CELL_SIZE) + offset;
+                    int drawY = MARGIN + (m.x() * CELL_SIZE) + offset;
+                    g2.fillOval(drawX, drawY, hintDiameter, hintDiameter);
                 }
             }
         }
@@ -157,11 +177,6 @@ public class BoardPanel extends JPanel {
             int colYTop = MARGIN - 12;
             g2.drawString(colLabel, colX, colYTop);
 
-            /*
-            // sotto
-            int colYBottom = MARGIN + (boardSize * CELL_SIZE) + fm.getAscent() + 8;
-            g2.drawString(colLabel, colX, colYBottom);
-             */
             // numeri righe
             String rowLabel = String.valueOf(i + 1);
             int rowLabelW = fm.stringWidth(rowLabel);
@@ -170,12 +185,6 @@ public class BoardPanel extends JPanel {
             // sinistra
             int rowXLeft = MARGIN - rowLabelW - 12;
             g2.drawString(rowLabel, rowXLeft, rowY);
-
-            /* 
-            // destra
-            int rowXRight = MARGIN + (boardSize * CELL_SIZE) + 12;
-            g2.drawString(rowLabel, rowXRight, rowY);
-             */
         }
 
 

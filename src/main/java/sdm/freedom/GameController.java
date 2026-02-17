@@ -36,28 +36,32 @@ public class GameController implements MoveInputListener {
 
     public Move[] getLegalMoves() {
         if (gameOver) return new Move[0];
-        return  match.giveCurrentState().getLegalSuccessors();
+        return  match.getCurrentState().getLegalSuccessors();
+    }
+
+    public Move getLastMove() {
+        return match.getCurrentState().getLastMove();
     }
 
     private void startTurn() {
         AbstractAgent agent = agents[match.getCurrentPlayerIdx()];
 
         CompletableFuture<Move> future =
-                agent.selectNextMove(match.giveCurrentState());
+                agent.selectNextMove(match.getCurrentState());
 
         future.thenAccept(this::applyMove);
     }
 
     private void applyMove(Move move) {
-        if (!match.checkValidMove(move)) throw new IllegalArgumentException("Illegal move");
+        if (!match.checkValidMove(move)) return;
 
         match.applyAMove(move);
 
         int[] scores = match.evaluateBoard();
-        uiController.refresh(match.getCurrentPlayer(), scores[0], scores[1]);
+        uiController.refresh(getPlayerTurn(), scores[0], scores[1]);
         uiController.repaintBoard();
 
-        if (match.giveCurrentState().isTerminal()) {
+        if (match.getCurrentState().isTerminal()) {
             gameOver = true;
             endGame(scores);
         } else {
@@ -74,16 +78,33 @@ public class GameController implements MoveInputListener {
         uiController.showGameOver(result, scores[0], scores[1]);
     }
 
+    public boolean canSkip() {
+        if (match == null || gameOver) {
+            return false;
+        }
+        for (Move m : getLegalMoves()) {
+            if (m.skipMove()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public boolean isGameOver(){
         return gameOver;
     }
 
     public int[][] getBoard() {
-        return match.giveCurrentState().getBoard().getBoardMatrix();
+        return match.getCurrentState().getBoard().getBoardMatrix();
+    }
+
+    public int getPlayerTurn() {
+        return match.getCurrentPlayer();
     }
 
     @Override
     public void onMoveSelected(Move move) {
+        if(!match.checkValidMove(move)) return;
         AbstractAgent agent = agents[match.getCurrentPlayerIdx()];
 
         if (agent instanceof InputListenerAgent inputAgent) {

@@ -1,5 +1,7 @@
 package sdm.freedom.gui;
 
+import sdm.freedom.GameController;
+
 import java.awt.BorderLayout;
 
 import javax.swing.JFrame;
@@ -34,6 +36,8 @@ public class GameGUI extends JFrame {
         boardPanel.repaint();
         // aggiorna i testi laterali
         infoPanel.updateInfo(currentPlayer, whiteScore, blackScore);
+        // mostra/nascondi il bottone skip in base alla logica
+        infoPanel.setSkipVisible(GameController.getInstance().canSkip());
     }
 
     public void showGameOver(String risultato, int whiteScore, int blackScore) {

@@ -50,7 +50,9 @@ public class GameController implements MoveInputListener {
     }
 
     private void startTurn() {
-        if (gameOver) return;
+        if (gameOver) {
+            return;
+        }
 
         AbstractAgent agent = agents[match.getCurrentPlayerIdx()];
 
@@ -61,7 +63,9 @@ public class GameController implements MoveInputListener {
     }
 
     private void applyMove(Move move) {
-        if (gameOver) return;
+        if (gameOver) {
+            return;
+        }
 
         if (!match.checkValidMove(move)) {
             return;
@@ -134,7 +138,9 @@ public class GameController implements MoveInputListener {
 
     @Override
     public void onMoveSelected(Move move) {
-        if (gameOver || match == null) return;
+        if (gameOver || match == null) {
+            return;
+        }
 
         if (!match.checkValidMove(move)) {
             return;

@@ -34,39 +34,36 @@ public class Match {
     }
 
     public boolean checkValidMove(Move NewMove){
-        if (NewMove.skipMove()) {
+        if (NewMove.skipMove() || CurrentState.getLastMove() == null) {
             return true;
         }
-        if (CurrentState.getBoard().isOutOfBounds(NewMove) || CurrentState.giveBoardPosition(NewMove) !=0){
+        if (CurrentState.getBoard().isOutOfBounds(NewMove) || CurrentState.getBoardPosition(NewMove) !=0){
             return false;
         }
-        if (CurrentState.getLastMove() == null){
-            return true;
-        }
         int[][] neighbours = {{1,0},{-1,0},{0,1},{0,-1},{1,1},{1,-1},{-1,1},{-1,-1}};
-        boolean flagFreedom=false; //checks for empty spaces next to the last move
-        boolean flagNext=false;
+        boolean flagFreedom=true; //checks for empty spaces next to the last move
+
 
         for(int[] nei: neighbours){
 
             int newx = CurrentState.getLastMove().returnMove()[0]+nei[0];
             int newy = CurrentState.getLastMove().returnMove()[1]+nei[1];
             Move LastMoveNeighbour = new Move(newx,newy);
-            if(CurrentState.getBoard().isOutOfBounds(new Move(newx,newy))){
+            if(CurrentState.getBoard().isOutOfBounds(LastMoveNeighbour)){
                 continue;
             }
-            if(CurrentState.giveBoardPosition(LastMoveNeighbour)==0) {
-                flagFreedom = true;
+            if(CurrentState.getBoardPosition(LastMoveNeighbour)==0) {
+                flagFreedom = false;
             }
             if(NewMove.equals(LastMoveNeighbour)){
-                flagNext = true;
+                return true;
             }
         }
-        return !flagFreedom || flagNext;
+        return flagFreedom;
     }
 
-    public int givePosition(Move m){
-        return CurrentState.giveBoardPosition(m);
+    public int getPosition(Move m){
+        return CurrentState.getBoardPosition(m);
     }
 
     public int[] evaluateBoard(){

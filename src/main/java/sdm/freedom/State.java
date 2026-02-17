@@ -15,9 +15,9 @@ public class State {
     }
 
     public void applyMove(Move NewMove,int player){
+        LastMove=NewMove;
         if(!(NewMove.skipMove())){
             CurrentBoard.applyMove(NewMove,player);
-            LastMove=NewMove;
         }
     }
 

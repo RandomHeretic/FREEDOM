@@ -23,18 +23,14 @@ public class Match {
     }
 
     public void applyAMove(Move NewMove){
-        // gestione skip move -> se il giocatore sceglie di saltare l'ultima mossa, cambia solo il turno
-        if (NewMove.skipMove()) {
-            CurrentPlayer = 3 - CurrentPlayer;
-            return;
-        }
-        if(checkValidMove(NewMove)) {
-            CurrentState.applyMove(NewMove, CurrentPlayer);
-            CurrentPlayer = 3-CurrentPlayer; //swap between 1 and 2
-        }
+        CurrentState.applyMove(NewMove, CurrentPlayer);
+        CurrentPlayer = 3-CurrentPlayer; //swap between 1 and 2
     }
 
     public boolean checkValidMove(Move NewMove){
+        if (NewMove.skipMove()) {
+            return true;
+        }
         if (CurrentState.getBoard().isOutOfBounds(NewMove) || CurrentState.giveBoardPosition(NewMove) !=0){
             return false;
         }

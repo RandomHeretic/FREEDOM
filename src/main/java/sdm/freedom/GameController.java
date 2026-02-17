@@ -54,7 +54,7 @@ public class GameController implements MoveInputListener {
     }
 
     private void applyMove(Move move) {
-        if (!match.checkValidMove(move)) return;
+
 
         match.applyMove(move);
 
@@ -112,7 +112,7 @@ public class GameController implements MoveInputListener {
 
     @Override
     public void onMoveSelected(Move move) {
-        if(!match.checkValidMove(move)) return;
+
         AbstractAgent agent = agents[match.getCurrentPlayerIdx()];
 
         if (agent instanceof InputListenerAgent inputAgent) {

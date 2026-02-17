@@ -1,5 +1,6 @@
 package sdm.freedom;
 
+
 public class Match {
     private final State CurrentState;
     private int CurrentPlayer;
@@ -23,7 +24,7 @@ public class Match {
     }
 
     public void checkAndApplyMove(Move NewMove){
-        if(!checkValidMove(NewMove)) return;
+
         CurrentState.applyMove(NewMove, CurrentPlayer);
         CurrentPlayer = 3-CurrentPlayer; //swap between 1 and 2
     }
@@ -33,34 +34,6 @@ public class Match {
         CurrentPlayer = 3-CurrentPlayer; //swap between 1 and 2
     }
 
-    public boolean checkValidMove(Move NewMove){
-        if (NewMove.skipMove() || CurrentState.getLastMove() == null) {
-            return true;
-        }
-        if (CurrentState.getBoard().isOutOfBounds(NewMove) || CurrentState.getBoardPosition(NewMove) !=0){
-            return false;
-        }
-        int[][] neighbours = {{1,0},{-1,0},{0,1},{0,-1},{1,1},{1,-1},{-1,1},{-1,-1}};
-        boolean flagFreedom=true; //checks for empty spaces next to the last move
-
-
-        for(int[] nei: neighbours){
-
-            int newx = CurrentState.getLastMove().returnMove()[0]+nei[0];
-            int newy = CurrentState.getLastMove().returnMove()[1]+nei[1];
-            Move LastMoveNeighbour = new Move(newx,newy);
-            if(CurrentState.getBoard().isOutOfBounds(LastMoveNeighbour)){
-                continue;
-            }
-            if(CurrentState.getBoardPosition(LastMoveNeighbour)==0) {
-                flagFreedom = false;
-            }
-            if(NewMove.equals(LastMoveNeighbour)){
-                return true;
-            }
-        }
-        return flagFreedom;
-    }
 
     public int getPosition(Move m){
         return CurrentState.getBoardPosition(m);

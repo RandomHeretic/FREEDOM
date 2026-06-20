@@ -12,5 +12,11 @@ public record Move(int x, int y, boolean skipMove) {
     public int[] returnMove(){
         return new int[] {x,y};
     }
-
+    @Override
+    public String toString() {
+        if(skipMove){
+            return "-1";
+        }
+        return x + " " + y;
+    }
 }

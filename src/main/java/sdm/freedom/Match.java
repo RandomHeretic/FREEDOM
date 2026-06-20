@@ -11,6 +11,11 @@ public class Match {
         CurrentPlayer = 1;
     }
 
+    public Match(State newState, int CurrentPlayer){
+        this.CurrentPlayer = CurrentPlayer;
+        this.CurrentState = newState;
+    }
+
     public State getCurrentState(){
         return CurrentState;
     }
@@ -23,11 +28,6 @@ public class Match {
         return getCurrentPlayer()-1;
     }
 
-    public void checkAndApplyMove(Move NewMove){
-
-        CurrentState.applyMove(NewMove, CurrentPlayer);
-        CurrentPlayer = 3-CurrentPlayer; //swap between 1 and 2
-    }
 
     public void applyMove(Move NewMove){
         CurrentState.applyMove(NewMove, CurrentPlayer);

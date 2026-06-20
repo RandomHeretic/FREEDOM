@@ -9,7 +9,7 @@ import java.util.concurrent.CompletableFuture;
 public class HumanAgent extends AbstractAgent implements InputListenerAgent {
 
     protected HumanAgent(int playerNumber) {
-        super("Human Player", playerNumber);
+        super("Player", playerNumber);
     }
 
     private CompletableFuture<Move> selectedMove;

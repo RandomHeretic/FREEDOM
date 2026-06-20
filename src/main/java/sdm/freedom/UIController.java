@@ -52,11 +52,7 @@ public class UIController {
     }
 
     public void backToMenu() {
-        try {
-            GameController.getInstance().saveState("output.txt");
-        }catch (Exception e){
 
-        }
         // resetta il GameController
         GameController.getInstance().reset();
 

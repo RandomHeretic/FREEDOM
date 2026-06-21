@@ -1,18 +1,11 @@
 package sdm.freedom.gui;
 
-import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Graphics;
+import java.awt.*;
 
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
+import sdm.freedom.GameController;
 import sdm.freedom.Move;
 import sdm.freedom.UIController;
 
@@ -22,8 +15,12 @@ public class InfoPanel extends JPanel {
     private final JLabel whiteScoreLabel;
     private final JLabel blackScoreLabel;
     private final JLabel resultLabel;
+    private final JTextField saveName;
+    private final JButton saveButton;
+    private final JLabel saveResultLabel;
     private final JButton skipButton;
     private final JButton menuButton;
+
 
     public InfoPanel() {
         // metto gli elementi uno sotto l'altro
@@ -54,6 +51,17 @@ public class InfoPanel extends JPanel {
         resultLabel.setFont(fontRisultato);
         resultLabel.setForeground(new Color(180, 0, 0));
         resultLabel.setVisible(false);
+
+        String saveText = "test";
+        saveName = new JTextField(saveText);
+        saveName.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        saveName.setPreferredSize(new Dimension(320, 32));
+        saveName.setMaximumSize(saveName.getPreferredSize());
+        saveButton = getJButton("Save");
+
+        saveButton.addActionListener(e -> this.tryToSaveState());
+        
+        saveResultLabel= new JLabel("");
 
         // bottone Skip -> appare solo quando è l'ultima cella
         // fix bottone Mac-> creo bottone custom che si dipinge da solo per evitare il look nativo bianco del Mac
@@ -90,27 +98,7 @@ public class InfoPanel extends JPanel {
         skipButton.addActionListener(e -> UIController.getInstance().userClickedForMove(new Move(true)));
 
         // bottone Menu -> torna al menu principale
-        menuButton = new JButton("Menu") {
-            @Override
-            protected void paintComponent(Graphics g) {
-                if (getModel().isPressed()) {
-                    g.setColor(getBackground().darker());
-                } else {
-                    g.setColor(getBackground());
-                }
-                g.fillRect(0, 0, getWidth(), getHeight());
-                super.paintComponent(g);
-            }
-        };
-        menuButton.setFont(new Font("Arial", Font.BOLD, 16));
-        menuButton.setBackground(new Color(80, 80, 200));
-        menuButton.setForeground(Color.WHITE);
-        menuButton.setContentAreaFilled(false);
-        menuButton.setFocusPainted(false);
-        menuButton.setBorderPainted(false);
-        menuButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        menuButton.setPreferredSize(new Dimension(160, 45));
-        menuButton.setMaximumSize(new Dimension(160, 45));
+        menuButton = getJButton("Menu");
 
         menuButton.addActionListener(e -> UIController.getInstance().backToMenu());
 
@@ -123,11 +111,55 @@ public class InfoPanel extends JPanel {
         add(new JLabel(" "));
         add(new JLabel(" "));
         add(resultLabel);
+        add(new JLabel(" "));
+        add(saveName);
+        add(new JLabel(" "));
+        add(saveButton);
+        add(new JLabel(" "));
+        add(saveResultLabel);
+        add(new JLabel(" "));
         add(Box.createVerticalGlue()); // bottone in fondo pannello
         add(skipButton);
         add(Box.createRigidArea(new Dimension(0, 10)));
         add(menuButton);
         add(Box.createRigidArea(new Dimension(0, 20))); // margine sotto bottone
+    }
+
+    private JButton getJButton(String buttonText) {
+        JButton saveButton = new JButton(buttonText){
+            @Override
+            protected void paintComponent(Graphics g) {
+                if (getModel().isPressed()) {
+                    g.setColor(getBackground().darker());
+                } else {
+                    g.setColor(getBackground());
+                }
+                g.fillRect(0, 0, getWidth(), getHeight());
+                super.paintComponent(g);
+            }
+        };
+        saveButton.setFont(new Font("Arial", Font.BOLD, 16));
+        saveButton.setBackground(new Color(80, 80, 200));
+        saveButton.setForeground(Color.WHITE);
+        saveButton.setContentAreaFilled(false);
+        saveButton.setFocusPainted(false);
+        saveButton.setBorderPainted(false);
+        saveButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        saveButton.setPreferredSize(new Dimension(160, 45));
+        saveButton.setMaximumSize(new Dimension(160, 45));
+        return saveButton;
+    }
+
+    private void tryToSaveState(){
+        String fileName = saveName.getText();
+        if(!fileName.endsWith(".txt")){
+            fileName += ".txt";
+        }
+        if (GameController.getInstance().saveState(fileName)){
+            saveResultLabel.setText("File " + fileName + " saved successfully");
+        }else {
+            saveResultLabel.setText("File " + fileName + " couldn't be saved");
+        }
     }
 
     // per aggiornare i testi

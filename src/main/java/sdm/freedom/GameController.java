@@ -137,9 +137,7 @@ public class GameController implements MoveInputListener {
     }
 
     public boolean saveState(String s){
-        if(!s.endsWith(".txt")){
-            s += ".txt";
-        }
+
         Path path = Paths.get(s);
         int[][] board = this.getBoard();
         StringBuilder data = new StringBuilder();

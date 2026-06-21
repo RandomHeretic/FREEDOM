@@ -5,8 +5,6 @@ import java.util.concurrent.CompletableFuture;
 import javax.swing.SwingUtilities;
 
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.io.IOException;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -137,10 +135,18 @@ public class GameController implements MoveInputListener {
 
     public boolean saveState(String s){
 
+        String home = System.getProperty("user.home");
 
+        File saveDir = new File(home, ".freedom/saves");
 
+        try{
+            Files.createDirectories(saveDir.toPath());// used to make sure the directory exists
+        }catch (Exception e){
+            return false; // if something goes wrong i don't have the directory thus i can't save
+        }
 
-        Path path = Paths.get(s);
+        File saveFile = new File(saveDir, s);
+
         int[][] board = this.getBoard();
         StringBuilder data = new StringBuilder();
 
@@ -156,7 +162,7 @@ public class GameController implements MoveInputListener {
             data.append("\n");
         }
         try {
-            Files.write(path, data.toString().getBytes());
+            Files.write(saveFile.toPath(), data.toString().getBytes());
             return true; // successfully saved
         } catch (IOException e) {
             return false; // couldn't save

@@ -1,6 +1,8 @@
 package sdm.freedom.gui;
 
 import java.awt.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -16,10 +18,8 @@ public class InfoPanel extends JPanel {
     private final JLabel blackScoreLabel;
     private final JLabel resultLabel;
     private final JTextField saveName;
-    private final JButton saveButton;
     private final JLabel saveResultLabel;
     private final JButton skipButton;
-    private final JButton menuButton;
 
 
     public InfoPanel() {
@@ -52,12 +52,17 @@ public class InfoPanel extends JPanel {
         resultLabel.setForeground(new Color(180, 0, 0));
         resultLabel.setVisible(false);
 
-        String saveText = "test";
+        DateTimeFormatter formatter =
+                DateTimeFormatter.ofPattern("yyyyMMdd_HHmm");
+
+        // 2. Get current date-time
+        String timestamp = LocalDateTime.now().format(formatter);
+        String saveText = "Save"+timestamp;
         saveName = new JTextField(saveText);
         saveName.setFont(new Font("SansSerif", Font.PLAIN, 14));
         saveName.setPreferredSize(new Dimension(320, 32));
         saveName.setMaximumSize(saveName.getPreferredSize());
-        saveButton = getJButton("Save");
+        JButton saveButton = getJButton("Save");
 
         saveButton.addActionListener(e -> this.tryToSaveState());
         
@@ -98,7 +103,7 @@ public class InfoPanel extends JPanel {
         skipButton.addActionListener(e -> UIController.getInstance().userClickedForMove(new Move(true)));
 
         // bottone Menu -> torna al menu principale
-        menuButton = getJButton("Menu");
+        JButton menuButton = getJButton("Menu");
 
         menuButton.addActionListener(e -> UIController.getInstance().backToMenu());
 
@@ -152,8 +157,8 @@ public class InfoPanel extends JPanel {
 
     private void tryToSaveState(){
         String fileName = saveName.getText();
-        if(!fileName.endsWith(".txt")){
-            fileName += ".txt";
+        if(!fileName.endsWith(".dat")){
+            fileName += ".dat";
         }
         if (GameController.getInstance().saveState(fileName)){
             saveResultLabel.setText("File " + fileName + " saved successfully");

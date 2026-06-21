@@ -36,7 +36,7 @@ public class MenuGUI extends JFrame {
 
 
     public MenuGUI() {
-        super("Freedom \u2013 Menu");
+        super("Freedom - Menu");
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setResizable(false);
         getContentPane().setBackground(BG_DARK);
@@ -153,9 +153,16 @@ public class MenuGUI extends JFrame {
     }
 
     private void selectGameToLoad(){
+        String home = System.getProperty("user.home");
 
-        JFileChooser fileChooser = new JFileChooser();
+        File saveDir = new File(home, ".freedom/saves");
 
+        JFileChooser fileChooser = new JFileChooser(saveDir);
+        fileChooser.setFileFilter(
+                new javax.swing.filechooser.FileNameExtensionFilter(
+                        "Save Files (*.dat)", "dat"
+                )
+        );
         int result = fileChooser.showOpenDialog(null);
 
         if (result == JFileChooser.APPROVE_OPTION) {

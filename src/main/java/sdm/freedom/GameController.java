@@ -1,6 +1,5 @@
 package sdm.freedom;
 
-import java.util.InputMismatchException;
 import java.util.concurrent.CompletableFuture;
 
 import javax.swing.SwingUtilities;
@@ -138,6 +137,9 @@ public class GameController implements MoveInputListener {
 
     public boolean saveState(String s){
 
+
+
+
         Path path = Paths.get(s);
         int[][] board = this.getBoard();
         StringBuilder data = new StringBuilder();
@@ -229,7 +231,7 @@ public class GameController implements MoveInputListener {
 
         } catch (FileNotFoundException e) {
             return -1;
-        } catch (InputMismatchException | IllegalArgumentException e){
+        } catch (Exception e){
             return -2;
         }
 

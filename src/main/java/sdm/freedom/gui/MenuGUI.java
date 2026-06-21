@@ -11,20 +11,10 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.RenderingHints;
+import java.io.File;
 import java.util.Set;
 
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JSpinner;
-import javax.swing.SpinnerNumberModel;
-import javax.swing.SwingUtilities;
-import javax.swing.WindowConstants;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 import sdm.freedom.GameController;
@@ -42,6 +32,8 @@ public class MenuGUI extends JFrame {
     private final JSpinner boardSizeSpinner;
     private final JComboBox<String> agent1Combo;
     private final JComboBox<String> agent2Combo;
+    private final JLabel failLoadMessage;
+
 
     public MenuGUI() {
         super("Freedom \u2013 Menu");
@@ -114,7 +106,27 @@ public class MenuGUI extends JFrame {
         root.add(Box.createRigidArea(new Dimension(0, 20)));
 
         // button gioca
-        JButton playButton = new JButton("Gioca") {
+        JButton playButton = getJButton("Gioca");
+        playButton.addActionListener(e -> onPlay());
+
+        root.add(playButton);
+
+        root.add(new JLabel(" "));
+        JButton loadButton = getJButton("Load Game");
+        failLoadMessage = styledLabel(" ", new Font("Serif", Font.PLAIN, 16), new Color(255,10,10));
+        failLoadMessage.setAlignmentX(Component.CENTER_ALIGNMENT);
+        loadButton.addActionListener(e -> selectGameToLoad());
+        root.add(loadButton);
+        root.add(new JLabel(" "));
+        root.add(failLoadMessage);
+        root.add(new JLabel(" "));
+        setContentPane(root);
+        pack();
+        setLocationRelativeTo(null);
+    }
+
+    private JButton getJButton(String buttonName) {
+        JButton playButton = new JButton(buttonName) {
             @Override
             protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
@@ -136,13 +148,27 @@ public class MenuGUI extends JFrame {
         playButton.setPreferredSize(new Dimension(200, 48));
         playButton.setMaximumSize(new Dimension(200, 48));
         playButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        playButton.addActionListener(e -> onPlay());
 
-        root.add(playButton);
+        return playButton;
+    }
 
-        setContentPane(root);
-        pack();
-        setLocationRelativeTo(null);
+    private void selectGameToLoad(){
+
+        JFileChooser fileChooser = new JFileChooser();
+
+        int result = fileChooser.showOpenDialog(null);
+
+        if (result == JFileChooser.APPROVE_OPTION) {
+            File file = fileChooser.getSelectedFile();
+            int message =GameController.getInstance().loadState(file.getAbsolutePath());
+            if(message==0){
+                dispose();
+            }else if(message==-1){
+                failLoadMessage.setText("File not found");
+            }else{
+                failLoadMessage.setText("File could not be interpreted");
+            }
+        }
     }
 
     // avvia il gioco con le configurazioni selezionate, chiude il menu

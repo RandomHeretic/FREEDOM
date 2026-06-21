@@ -157,8 +157,10 @@ public class InfoPanel extends JPanel {
         }
         if (GameController.getInstance().saveState(fileName)){
             saveResultLabel.setText("File " + fileName + " saved successfully");
+            saveResultLabel.setForeground(new Color(10,150,10));
         }else {
             saveResultLabel.setText("File " + fileName + " couldn't be saved");
+            saveResultLabel.setForeground(new Color(150,10,10));
         }
     }
 

@@ -1,6 +1,8 @@
 package sdm.freedom.gui;
 
 import java.awt.*;
+import java.io.File;
+import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -23,57 +25,58 @@ public class InfoPanel extends JPanel {
 
 
     public InfoPanel() {
-        // metto gli elementi uno sotto l'altro
+        // putting the elements one under the other
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-        // estetics del pannello laterale
+        // side panel estetics
         setBackground(Color.LIGHT_GRAY);
         setPreferredSize(new Dimension(250, 0));
         setBorder(new EmptyBorder(20, 20, 20, 20));
 
-        // etichette label
+        //  labels
         Font fontTitolo = new Font("Arial", Font.BOLD, 18);
         Font fontTesto = new Font("Arial", Font.PLAIN, 16);
         Font fontRisultato = new Font("Arial", Font.BOLD, 20);
 
-        turnLabel = new JLabel("Turno: BIANCO");
+        turnLabel = new JLabel("Turn: WHITE");
         turnLabel.setFont(fontTitolo);
         turnLabel.setForeground(Color.BLUE);
 
-        whiteScoreLabel = new JLabel("Bianchi: 0");
+        whiteScoreLabel = new JLabel("White: 0");
         whiteScoreLabel.setFont(fontTesto);
 
-        blackScoreLabel = new JLabel("Neri: 0");
+        blackScoreLabel = new JLabel("Black: 0");
         blackScoreLabel.setFont(fontTesto);
 
-        // label risultato, nascosta finché la partita non finisce
+        // result label, hidden until the game ends
         resultLabel = new JLabel("");
         resultLabel.setFont(fontRisultato);
         resultLabel.setForeground(new Color(180, 0, 0));
         resultLabel.setVisible(false);
 
-        DateTimeFormatter formatter =
-                DateTimeFormatter.ofPattern("yyyyMMdd_HHmm");
-
-        // 2. Get current date-time
+        // automatic of the savefile
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmm");
         String timestamp = LocalDateTime.now().format(formatter);
         String saveText = "Save"+timestamp;
+        // savefile textbox to change the name if needed
         saveName = new JTextField(saveText);
         saveName.setFont(new Font("SansSerif", Font.PLAIN, 14));
         saveName.setPreferredSize(new Dimension(320, 32));
         saveName.setMaximumSize(saveName.getPreferredSize());
+
+        // save button -> save the current state, in case of failure display such
         JButton saveButton = getJButton("Save");
 
         saveButton.addActionListener(e -> this.tryToSaveState());
         
         saveResultLabel= new JLabel("");
 
-        // bottone Skip -> appare solo quando è l'ultima cella
-        // fix bottone Mac-> creo bottone custom che si dipinge da solo per evitare il look nativo bianco del Mac
+        // Skip button -> appears only when it's possible to skip
+        // fix button Mac-> custom button that colours itself if on MACOS to replace native white colour
         skipButton = new JButton("Skip Move") {
             @Override
             protected void paintComponent(Graphics g) {
-                // colore scuso se pushed
+                // darker colour if pushed
                 if (getModel().isPressed()) {
                     g.setColor(getBackground().darker());
                 } else {
@@ -90,19 +93,19 @@ public class InfoPanel extends JPanel {
         skipButton.setBackground(new Color(200, 80, 80));
         skipButton.setForeground(Color.WHITE);
 
-        // disattiva stile nativo Mac
+        // deactivates native Mac style
         skipButton.setContentAreaFilled(false);
         skipButton.setFocusPainted(false);
         skipButton.setBorderPainted(false);
         skipButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        skipButton.setPreferredSize(new Dimension(160, 45));  // dimensione fissa
+        skipButton.setPreferredSize(new Dimension(160, 45));  // fixed dimension
         skipButton.setMaximumSize(new Dimension(160, 45));
-        skipButton.setVisible(false); // nascosto finché non serve
+        skipButton.setVisible(false); // hidden until needed
 
-        // push -> Singleton esegue skip
+        // push -> Singleton executes skip
         skipButton.addActionListener(e -> UIController.getInstance().userClickedForMove(new Move(true)));
 
-        // bottone Menu -> torna al menu principale
+        // Menu button -> goes back to main menu
         JButton menuButton = getJButton("Menu");
 
         menuButton.addActionListener(e -> UIController.getInstance().backToMenu());
@@ -123,11 +126,11 @@ public class InfoPanel extends JPanel {
         add(new JLabel(" "));
         add(saveResultLabel);
         add(new JLabel(" "));
-        add(Box.createVerticalGlue()); // bottone in fondo pannello
+        add(Box.createVerticalGlue()); // button on the bottom of the panel
         add(skipButton);
         add(Box.createRigidArea(new Dimension(0, 10)));
         add(menuButton);
-        add(Box.createRigidArea(new Dimension(0, 20))); // margine sotto bottone
+        add(Box.createRigidArea(new Dimension(0, 20))); // bottom margin
     }
 
     private JButton getJButton(String buttonText) {
@@ -156,11 +159,23 @@ public class InfoPanel extends JPanel {
     }
 
     private void tryToSaveState(){
-        String fileName = saveName.getText();
+        String fileName = saveName.getText(); // get the savefile name from the form
         if(!fileName.endsWith(".dat")){
             fileName += ".dat";
         }
-        if (GameController.getInstance().saveState(fileName)){
+
+        // get the directory where I'm going to save the files
+        String home = System.getProperty("user.home");
+        File saveDir = new File(home, ".freedom/saves");
+        boolean saveResult;
+        try{
+            Files.createDirectories(saveDir.toPath());// used to make sure the directory exists
+            saveResult = GameController.getInstance().saveState(fileName,saveDir); // try to save
+        }catch (Exception e){
+            saveResult = false; // if something goes wrong I don't have the directory thus I can't save
+        }
+
+        if (saveResult){// display a message according to success or failure
             saveResultLabel.setText("File " + fileName + " saved successfully");
             saveResultLabel.setForeground(new Color(10,150,10));
         }else {
@@ -169,30 +184,30 @@ public class InfoPanel extends JPanel {
         }
     }
 
-    // per aggiornare i testi
+    // update texts
     public void updateInfo(int currentPlayer, int whiteScore, int blackScore) {
         if (currentPlayer == 1) {
-            turnLabel.setText("Turno: BIANCO");
+            turnLabel.setText("Turn: WHITE");
             turnLabel.setForeground(Color.BLACK);
         } else {
-            turnLabel.setText("Turno: NERO");
+            turnLabel.setText("Turn: BLACK");
             turnLabel.setForeground(Color.RED);
         }
 
-        whiteScoreLabel.setText("Bianchi: " + whiteScore);
-        blackScoreLabel.setText("Neri: " + blackScore);
+        whiteScoreLabel.setText("White: " + whiteScore);
+        blackScoreLabel.setText("Black: " + blackScore);
     }
 
-    // mostra o nasconde il bottone skip
+    // hides or shows the skip button
     public void setSkipVisible(boolean visible) {
         skipButton.setVisible(visible);
     }
 
     public void showGameOver(String risultato, int whiteScore, int blackScore) {
-        turnLabel.setText("FINE PARTITA");
+        turnLabel.setText("END OF THE GAME");
         turnLabel.setForeground(new Color(180, 0, 0));
-        whiteScoreLabel.setText("Bianchi: " + whiteScore);
-        blackScoreLabel.setText("Neri: " + blackScore);
+        whiteScoreLabel.setText("White: " + whiteScore);
+        blackScoreLabel.setText("Black: " + blackScore);
         skipButton.setVisible(false);
         resultLabel.setText(risultato);
         resultLabel.setVisible(true);

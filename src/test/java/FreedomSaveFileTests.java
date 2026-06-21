@@ -19,37 +19,39 @@ public class FreedomSaveFileTests {
 
     @Test
     public void verifySavesToGivenFile() throws Exception{
-        Path tempDir = Files.createTempDirectory("test-save");
-        AbstractAgent[] agents = new AbstractAgent[]{
+        Path tempDir = Files.createTempDirectory("test-save"); // temp directory
+        AbstractAgent[] agents = new AbstractAgent[]{ // agents to "start" a new game
                 AgentFactory.create("Player", 1),
                 AgentFactory.create("Random", 2)
         };
         GameController game = GameController.getInstance();
         game.initialize(4,UIController.getInstance(),agents);
 
-        Path saveFile = tempDir.resolve("test.txt");
+        String saveFile = "test.dat";
 
-        assertTrue(game.saveState(saveFile.toString()));
+        assertTrue(game.saveState(saveFile,tempDir.toFile())); // save the game
 
-        assertTrue(Files.exists(saveFile));
+        assertTrue(Files.exists(tempDir.resolve(saveFile))); // check that it exists
     }
 
 
     @Test
     public void verifySavesDataCorrectly() throws Exception{
 
-        AbstractAgent[] agents = new AbstractAgent[]{
+        AbstractAgent[] agents = new AbstractAgent[]{// agents to "start" a new game (one must be the player otherwise the game will desync from the save
                 AgentFactory.create("Player", 1),
                 AgentFactory.create("Player", 2)
         };
         GameController game = GameController.getInstance();
         game.initialize(4,UIController.getInstance(),agents);
         game.applyMove(new Move(2,2));
-        Path tempDir = Files.createTempDirectory("test-save");
-        Path saveFile = tempDir.resolve("test.txt");
-        assertTrue(game.saveState(saveFile.toString()));
 
-        Scanner scanner = new Scanner(new File(saveFile.toString()));
+        Path tempDir = Files.createTempDirectory("test-save");
+        String saveFile = "test.dat";
+        assertTrue(game.saveState(saveFile,tempDir.toFile())); // save the game
+
+        // from this point forward it checks that the saved data is the same of the original
+        Scanner scanner = new Scanner(new File(tempDir.resolve(saveFile).toString()));
         String agent1Name = scanner.next();
         String agent2Name = scanner.next();
         AgentFactory.create(agent1Name, 1); // this will throw an exception if the file did not save correctly
@@ -92,14 +94,16 @@ public class FreedomSaveFileTests {
         game.initialize(4,UIController.getInstance(),agents);
         game.applyMove(new Move(2,2));
         Path tempDir = Files.createTempDirectory("test-save");
-        Path saveFile = tempDir.resolve("test.txt");
-        assertTrue(game.saveState(saveFile.toString()));
+        String saveFile = "test.dat";
+        assertTrue(game.saveState(saveFile,tempDir.toFile())); // save the game
 
-        game.reset();
+        game.reset(); // reset the game
 
-        assertEquals(0,game.loadState(saveFile.toString()));
+        assertEquals(0,game.loadState(tempDir.resolve(saveFile).toString())); // load the game from savefile
 
-        Scanner scanner = new Scanner(new File(saveFile.toString()));
+
+        // from this point forward it checks that the loaded data is the same of the saved data
+        Scanner scanner = new Scanner(new File(tempDir.resolve(saveFile).toString()));
         String agent1Name = scanner.next();
         String agent2Name = scanner.next();
         AgentFactory.create(agent1Name, 1); // this will throw an exception if the file did not save correctly
@@ -133,4 +137,22 @@ public class FreedomSaveFileTests {
         scanner.close();
     }
 
+
+    @Test
+    public void verifyEmptyBoardLoads() throws Exception{
+        AbstractAgent[] agents = new AbstractAgent[]{
+                AgentFactory.create("Player", 1),
+                AgentFactory.create("Player", 2)
+        };
+        GameController game = GameController.getInstance();
+        game.initialize(4,UIController.getInstance(),agents);
+
+        Path tempDir = Files.createTempDirectory("test-save");
+        String saveFile = "test.dat";
+        assertTrue(game.saveState(saveFile,tempDir.toFile())); // save game without moves
+
+        game.reset(); // reset the game
+
+        assertEquals(0,game.loadState(tempDir.resolve(saveFile).toString())); // check that loads without failing
+    }
 }

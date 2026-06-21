@@ -41,24 +41,24 @@ public class MenuGUI extends JFrame {
         setResizable(false);
         getContentPane().setBackground(BG_DARK);
 
-        // layout principale
+        // main layout
         JPanel root = new JPanel();
-        root.setLayout(new BoxLayout(root, BoxLayout.Y_AXIS)); // layout verticale
+        root.setLayout(new BoxLayout(root, BoxLayout.Y_AXIS)); // vertical layout
         root.setBackground(BG_DARK);
         root.setBorder(new EmptyBorder(30, 40, 30, 40));
 
-        // titolo e sottotitolo
+        // title and subtitle
         JLabel title = styledLabel("Freedom", new Font("Serif", Font.BOLD, 36), ACCENT);
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
         root.add(title);
         root.add(Box.createRigidArea(new Dimension(0, 8)));
 
-        JLabel subtitle = styledLabel("Configura la partita", new Font("SansSerif", Font.PLAIN, 14), TEXT_LIGHT);
+        JLabel subtitle = styledLabel("Configure your game", new Font("SansSerif", Font.PLAIN, 14), TEXT_LIGHT);
         subtitle.setAlignmentX(Component.CENTER_ALIGNMENT);
         root.add(subtitle);
         root.add(Box.createRigidArea(new Dimension(0, 24)));
 
-        // form di configurazione
+        // config form
         JPanel form = new JPanel(new GridBagLayout());
         form.setBackground(BG_PANEL);
         form.setBorder(BorderFactory.createCompoundBorder(
@@ -69,10 +69,10 @@ public class MenuGUI extends JFrame {
         gbc.insets = new Insets(8, 8, 8, 8);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        // riga 0 - dimensione board
+        // row 0 - board dimensions
         gbc.gridx = 0;
         gbc.gridy = 0;
-        form.add(formLabel("Dimensione tavola:"), gbc);
+        form.add(formLabel("Board Dimension:"), gbc);
 
         boardSizeSpinner = new JSpinner(new SpinnerNumberModel(8, 4, 20, 1));
         boardSizeSpinner.setFont(new Font("SansSerif", Font.PLAIN, 14));
@@ -80,22 +80,22 @@ public class MenuGUI extends JFrame {
         gbc.gridx = 1;
         form.add(boardSizeSpinner, gbc);
 
-        // riga 1 - giocatore 1 (Bianco)
+        // row 1 - player 1 (white)
         Set<String> agents = AgentFactory.availableAgents();
         String[] agentNames = agents.toArray(new String[0]);
 
         gbc.gridx = 0;
         gbc.gridy = 1;
-        form.add(formLabel("Giocatore 1 (Bianco):"), gbc);
+        form.add(formLabel("Player 1 (White):"), gbc);
 
         agent1Combo = styledCombo(agentNames);
         gbc.gridx = 1;
         form.add(agent1Combo, gbc);
 
-        // riga 2 - giocatore 2 (Nero)
+        // row 2 - Player 2 (Black)
         gbc.gridx = 0;
         gbc.gridy = 2;
-        form.add(formLabel("Giocatore 2 (Nero):"), gbc);
+        form.add(formLabel("Player 2 (Black):"), gbc);
 
         agent2Combo = styledCombo(agentNames);
         gbc.gridx = 1;
@@ -105,13 +105,15 @@ public class MenuGUI extends JFrame {
         root.add(form);
         root.add(Box.createRigidArea(new Dimension(0, 20)));
 
-        // button gioca
-        JButton playButton = getJButton("Gioca");
+        // play button
+        JButton playButton = getJButton("Play");
         playButton.addActionListener(e -> onPlay());
 
         root.add(playButton);
 
         root.add(new JLabel(" "));
+
+        // load game button
         JButton loadButton = getJButton("Load Game");
         failLoadMessage = styledLabel(" ", new Font("Serif", Font.PLAIN, 16), new Color(255,10,10));
         failLoadMessage.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -126,6 +128,8 @@ public class MenuGUI extends JFrame {
     }
 
     private JButton getJButton(String buttonName) {
+        // method used to create and style the load and play buttons
+
         JButton playButton = new JButton(buttonName) {
             @Override
             protected void paintComponent(Graphics g) {
@@ -153,24 +157,28 @@ public class MenuGUI extends JFrame {
     }
 
     private void selectGameToLoad(){
-        String home = System.getProperty("user.home");
+        // method to select a savefile to load
+        String home = System.getProperty("user.home"); // users home directory
 
-        File saveDir = new File(home, ".freedom/saves");
+        File saveDir = new File(home, ".freedom/saves");// save file directory
 
-        JFileChooser fileChooser = new JFileChooser(saveDir);
+        JFileChooser fileChooser = new JFileChooser(saveDir); // start the file chooser
         fileChooser.setFileFilter(
                 new javax.swing.filechooser.FileNameExtensionFilter(
                         "Save Files (*.dat)", "dat"
                 )
         );
+        // get the chooser response
         int result = fileChooser.showOpenDialog(null);
-
         if (result == JFileChooser.APPROVE_OPTION) {
             File file = fileChooser.getSelectedFile();
+            // try to load the game
             int message =GameController.getInstance().loadState(file.getAbsolutePath());
-            if(message==0){
+
+
+            if(message==0){// if i can i then dispose of the menuUI
                 dispose();
-            }else if(message==-1){
+            }else if(message==-1){// else display error message
                 failLoadMessage.setText("File not found");
             }else{
                 failLoadMessage.setText("File could not be interpreted");
@@ -178,7 +186,7 @@ public class MenuGUI extends JFrame {
         }
     }
 
-    // avvia il gioco con le configurazioni selezionate, chiude il menu
+    // start the game using the selected configurations, then closes the menu
     private void onPlay() {
         int boardSize = (int) boardSizeSpinner.getValue();
         String type1 = (String) agent1Combo.getSelectedItem();
@@ -189,14 +197,14 @@ public class MenuGUI extends JFrame {
             AgentFactory.create(type2, 2)
         };
 
-        // chiudi il menu
+        // close the menu
         dispose();
 
-        // lancia il gioco
+        // start the game
         UIController uiController = UIController.getInstance();
         uiController.start(boardSize);
 
-        // ritardia l'inizializzazione del GameController per assicurarsi che la UI sia pronta
+        // delay the initialization of the GameController to ensure that the UI is ready
         SwingUtilities.invokeLater(()
                 -> GameController.getInstance().initialize(boardSize, uiController, agentsArr)
         );

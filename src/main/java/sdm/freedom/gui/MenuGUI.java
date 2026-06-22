@@ -17,6 +17,7 @@ import java.util.Set;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
+import sdm.freedom.FileLoaderResult;
 import sdm.freedom.GameController;
 import sdm.freedom.UIController;
 import sdm.freedom.agents.AbstractAgent;
@@ -115,7 +116,7 @@ public class MenuGUI extends JFrame {
 
         // load game button
         JButton loadButton = getJButton("Load Game");
-        failLoadMessage = styledLabel(" ", new Font("Serif", Font.PLAIN, 16), new Color(255,10,10));
+        failLoadMessage = styledLabel(" ", new Font("Serif", Font.PLAIN, 16), new Color(255, 10, 10));
         failLoadMessage.setAlignmentX(Component.CENTER_ALIGNMENT);
         loadButton.addActionListener(e -> selectGameToLoad());
         root.add(loadButton);
@@ -156,7 +157,7 @@ public class MenuGUI extends JFrame {
         return playButton;
     }
 
-    private void selectGameToLoad(){
+    private void selectGameToLoad() {
         // method to select a savefile to load
         String home = System.getProperty("user.home"); // users home directory
 
@@ -173,15 +174,19 @@ public class MenuGUI extends JFrame {
         if (result == JFileChooser.APPROVE_OPTION) {
             File file = fileChooser.getSelectedFile();
             // try to load the game
-            int message =GameController.getInstance().loadState(file.getAbsolutePath());
+            FileLoaderResult message = GameController.getInstance().loadState(file.getAbsolutePath());
 
-
-            if(message==0){// if i can i then dispose of the menuUI
-                dispose();
-            }else if(message==-1){// else display error message
-                failLoadMessage.setText("File not found");
-            }else{
-                failLoadMessage.setText("File could not be interpreted");
+            switch (message) {
+                case SUCCESS:
+                    // dispose of the menuUI if loading finished successfully
+                    dispose();
+                    break;
+                case FILE_NOT_FOUND:
+                    failLoadMessage.setText("File not found");
+                    break;
+                case PARSE_ERROR:
+                    failLoadMessage.setText("File could not be interpreted");
+                    break;
             }
         }
     }
@@ -193,8 +198,8 @@ public class MenuGUI extends JFrame {
         String type2 = (String) agent2Combo.getSelectedItem();
 
         AbstractAgent[] agentsArr = new AbstractAgent[]{
-            AgentFactory.create(type1, 1),
-            AgentFactory.create(type2, 2)
+                AgentFactory.create(type1, 1),
+                AgentFactory.create(type2, 2)
         };
 
         // close the menu

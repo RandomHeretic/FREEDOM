@@ -99,7 +99,7 @@ public class FreedomSaveFileTests {
 
         game.reset(); // reset the game
 
-        assertEquals(0,game.loadState(tempDir.resolve(saveFile).toString())); // load the game from savefile
+        assertEquals(FileLoaderResult.SUCCESS,game.loadState(tempDir.resolve(saveFile).toString())); // load the game from savefile
 
 
         // from this point forward it checks that the loaded data is the same of the saved data
@@ -153,6 +153,6 @@ public class FreedomSaveFileTests {
 
         game.reset(); // reset the game
 
-        assertEquals(0,game.loadState(tempDir.resolve(saveFile).toString())); // check that loads without failing
+        assertEquals(FileLoaderResult.SUCCESS,game.loadState(tempDir.resolve(saveFile).toString())); // check that loads without failing
     }
 }

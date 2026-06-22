@@ -12,7 +12,7 @@ public class MinimaxAgent extends AbstractAgent {
     private final int MAX_DEPTH_PLIES = 8;
 
     protected MinimaxAgent(int playerNumber) {
-        super("AI Player", playerNumber);
+        super("AI", playerNumber);
     }
 
     @Override

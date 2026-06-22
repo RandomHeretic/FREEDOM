@@ -4,7 +4,14 @@ import java.util.concurrent.CompletableFuture;
 
 import javax.swing.SwingUtilities;
 
+import java.nio.file.Files;
+import java.io.IOException;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
+
 import sdm.freedom.agents.AbstractAgent;
+import sdm.freedom.agents.AgentFactory;
 import sdm.freedom.agents.InputListenerAgent;
 
 public class GameController implements MoveInputListener {
@@ -60,7 +67,7 @@ public class GameController implements MoveInputListener {
         future.thenAccept(this::applyMove);
     }
 
-    private void applyMove(Move move) {
+    public void applyMove(Move move) {
 
         match.applyMove(move);
 
@@ -89,9 +96,9 @@ public class GameController implements MoveInputListener {
 
     private void endGame(int[] scores) {
         String result
-                = scores[0] > scores[1] ? "Vince il BIANCO!"
-                        : scores[1] > scores[0] ? "Vince il NERO!"
-                                : "PAREGGIO!";
+                = scores[0] > scores[1] ? "WHITE won!"
+                        : scores[1] > scores[0] ? "BLACK won!"
+                                : "TIE!";
 
         uiController.showGameOver(result, scores[0], scores[1]);
     }
@@ -124,5 +131,123 @@ public class GameController implements MoveInputListener {
         if (agent instanceof InputListenerAgent inputAgent) {
             inputAgent.onUserMove(move);
         }
+    }
+
+    public boolean saveState(String s,File saveDir){
+
+        File saveFile = new File(saveDir, s);
+
+        int[][] board = this.getBoard();
+        StringBuilder data = new StringBuilder();
+
+        // agent names
+        data.append(agents[0].getAgentName()).append(" ").append(agents[1].getAgentName()).append("\n");
+        // whose turn it is and the board length
+        data.append(this.getPlayerTurn()).append(" ").append(board.length).append("\n");
+        // the last move made
+        if(match.getCurrentState().getLastMove() ==null){ // start of game edge case
+            data.append("-1"); // gives skip move action, since it does not change the board state
+        }else {
+            data.append(match.getCurrentState().getLastMove());
+        }
+        data.append("\n");
+        // board contents
+        for (int[] row : board) {
+            for (int slot : row) {
+                data.append(slot).append(" ");
+            }
+            data.append("\n");
+        }
+
+        // then I try to save
+        try {
+            Files.write(saveFile.toPath(), data.toString().getBytes());
+            return true; // successfully saved
+        } catch (IOException e) {
+            return false; // couldn't save
+        }
+    }
+
+    public int loadState(String s){
+        // the function return 0 if it worked properly, the saved game also begins
+        // if the function returns -1 it means that the file could not be found
+        // if the function returns -2 it means that the file contains wrongful data
+        try {
+
+            //read the data and check that is consistent with the game
+            Scanner scanner = new Scanner(new File(s));
+            String agent1Name = scanner.next();
+            String agent2Name = scanner.next();
+
+
+            int currentTurn = scanner.nextInt();
+            if(currentTurn!=1 && currentTurn !=2){
+                return -2;
+            }
+            int boardSize = scanner.nextInt();
+            if(boardSize<4){
+                return -2;
+            }
+
+            int x = scanner.nextInt();
+            Move LastMove;
+            if (x>=0){
+                int y = scanner.nextInt();
+                if (y >= boardSize || x >= boardSize){
+                    return -2;
+                }
+                LastMove = new Move(x,y);
+            }else if(x==-1){
+                LastMove = new Move(true);
+            }else {
+                return -2;
+            }
+
+            int[][] board = new int[boardSize][boardSize];
+
+            for(int i=0;i<boardSize;i++){
+                for (int j=0;j<boardSize;j++){
+                    board[i][j]= scanner.nextInt();
+                    if (board[i][j]!= 0 && board[i][j] != 1 && board[i][j] != 2){
+                        return -2;
+                    }
+                }
+            }
+            scanner.close();
+
+            // begins to insert the data to the project structures
+            State newState = new State(new Board(board));
+
+            int previousTurn = (currentTurn-1) - (currentTurn-2)*2; // player that made the last move
+            System.out.print("banana");
+            newState.applyMove(LastMove,previousTurn);
+
+            //get the agents
+            AbstractAgent[] agentsArr = new AbstractAgent[]{
+                    AgentFactory.create(agent1Name, 1),
+                    AgentFactory.create(agent2Name, 2)
+            };
+
+            // start the game from where we left
+            UIController uiController = UIController.getInstance();
+            uiController.start(boardSize);
+
+            this.uiController = uiController;
+            this.agents = agentsArr;
+            this.match = new Match(newState,currentTurn);
+
+            uiController.setMoveInputListener(this);
+
+            refreshUI();
+            CompletableFuture.runAsync(this::startTurn);
+
+        } catch (FileNotFoundException e) {
+            return -1;
+        } catch (Exception e){
+            return -2;
+        }
+
+
+        return 0;
     }
 }

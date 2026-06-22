@@ -52,6 +52,7 @@ public class UIController {
     }
 
     public void backToMenu() {
+
         // resetta il GameController
         GameController.getInstance().reset();
 

@@ -9,7 +9,7 @@ import java.util.concurrent.CompletableFuture;
 public class RandomAgent extends AbstractAgent {
 
     protected RandomAgent(int playerNumber) {
-        super("Random Player", playerNumber);
+        super("Random", playerNumber);
     }
 
     @Override

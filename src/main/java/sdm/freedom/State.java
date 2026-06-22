@@ -42,8 +42,8 @@ public class State {
 
         ArrayList<Move> successorList = new ArrayList<>();
 
-        //first turn case
-        if(LastMove == null){
+        //first turn case and load from new board
+        if(LastMove == null || LastMove.skipMove()){
             for (int x = 0; x < boardSize; x++)
                 for (int y = 0; y < boardSize; y++)
                     successorList.add(new Move(x, y));

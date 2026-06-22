@@ -168,7 +168,7 @@ public class GameController implements MoveInputListener {
         }
     }
 
-    public int loadState(String s){
+    public FileLoaderResult loadState(String s){
         // the function return 0 if it worked properly, the saved game also begins
         // if the function returns -1 it means that the file could not be found
         // if the function returns -2 it means that the file contains wrongful data
@@ -182,11 +182,11 @@ public class GameController implements MoveInputListener {
 
             int currentTurn = scanner.nextInt();
             if(currentTurn!=1 && currentTurn !=2){
-                return -2;
+                return FileLoaderResult.PARSE_ERROR;
             }
             int boardSize = scanner.nextInt();
             if(boardSize<4){
-                return -2;
+                return FileLoaderResult.PARSE_ERROR;
             }
 
             int x = scanner.nextInt();
@@ -194,13 +194,13 @@ public class GameController implements MoveInputListener {
             if (x>=0){
                 int y = scanner.nextInt();
                 if (y >= boardSize || x >= boardSize){
-                    return -2;
+                    return FileLoaderResult.PARSE_ERROR;
                 }
                 LastMove = new Move(x,y);
             }else if(x==-1){
                 LastMove = new Move(true);
             }else {
-                return -2;
+                return FileLoaderResult.PARSE_ERROR;
             }
 
             int[][] board = new int[boardSize][boardSize];
@@ -209,7 +209,7 @@ public class GameController implements MoveInputListener {
                 for (int j=0;j<boardSize;j++){
                     board[i][j]= scanner.nextInt();
                     if (board[i][j]!= 0 && board[i][j] != 1 && board[i][j] != 2){
-                        return -2;
+                        return FileLoaderResult.PARSE_ERROR;
                     }
                 }
             }
@@ -242,12 +242,12 @@ public class GameController implements MoveInputListener {
             CompletableFuture.runAsync(this::startTurn);
 
         } catch (FileNotFoundException e) {
-            return -1;
+            return FileLoaderResult.FILE_NOT_FOUND;
         } catch (Exception e){
-            return -2;
+            return FileLoaderResult.PARSE_ERROR;
         }
 
 
-        return 0;
+        return FileLoaderResult.SUCCESS;
     }
 }

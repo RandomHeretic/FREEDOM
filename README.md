@@ -5,13 +5,6 @@ This project is aimed at recreating the [Freedom board game](https://boardgamege
 ## Build and Run
 
 ```bash
-javac sdm/freedom/Main.java
-java sdm.freedom.Main
-```
-
-or
-
-```bash
 ./gradlew run
 ```
 
